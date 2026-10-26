@@ -1,143 +1,94 @@
-**PayStream Guard
+PayStream Guard
 
-A Real-Time Payment Data Reliability Platform
+Real-Time Payment Data Reliability Platform
 
-Project status: In progress
+PayStream Guard is a data engineering project that simulates UPI-style payment events and processes them through a Kafka and PySpark Structured Streaming pipeline. The project focuses on reliable ingestion, fault injection, checkpoint recovery, and data quality.
 
-PayStream Guard is a data engineering project that simulates UPI-style payment events and processes them through a real-time streaming pipeline. It focuses on data quality, fault injection, reliable ingestion, checkpoint recovery, and event-level traceability.
-
-All payment events are synthetic and intended for development and demonstration purposes.
-
-Project Overview
-
-PayStream Guard demonstrates how a modern streaming data pipeline can ingest payment events, preserve raw records, and build toward reliable downstream data processing.
+Status: In Progress
 
 Architecture
-Synthetic Event Generator
-          |
-          v
-     Fault Injector
-          |
-          v
-    Apache Kafka
-  payment-events
-   3 partitions
-          |
-          v
-  PySpark Structured
-       Streaming
-          |
-          v
-   Parquet Data Lake
-      Bronze Layer
-          |
-          v
- Validation & Deduplication
-       (Week 2)
+text
+Event Generator → Fault Injector → Apache Kafka
+                                       |
+                                       v
+                              Spark Structured Streaming
+                                       |
+                                       v
+                                Parquet (Bronze)
+                                       |
+                                       v
+                          Validation & Deduplication
 
+Tech Stack
 
-Implementation Status
-Week 1 — Event Generation & Ingestion
-Synthetic payment event generator
-Data contract and event schema
-Fault injector with a manifest of injected defects
-Kafka producer keyed by transaction_id
-Kafka delivery count verification
-Spark bronze ingestion with Parquet output
-Checkpoint recovery and incremental ingestion verification
-Week 2 — Data Quality & Reliability
-Event validation and schema enforcement
-Invalid-event quarantine
-Duplicate detection and deduplication
-Late-event handling policy
-Week 3 — Data Lake & Orchestration
-S3-compatible data lake
-dbt transformation models
-Airflow orchestration
-Week 4 — Testing & Demonstration
-Throughput and performance benchmarks
-Failure recovery demonstrations
-Architecture diagram and technical documentation
-Technology Stack
-Technology	Purpose
-Python 3.11	Event generation and producer tooling
-Apache Kafka	Distributed event streaming
-PySpark Structured Streaming	Stream ingestion and processing
-Parquet	Columnar storage for the bronze layer
-Docker Compose	Local development environment
-AWS S3 / S3-compatible storage	Planned data lake
-dbt	Planned data transformations
-Apache Airflow	Planned workflow orchestration
+Python · Apache Kafka · PySpark · Structured Streaming · Parquet · Docker
+
+Key Features
+Generated synthetic payment events with a defined data contract.
+Injected controlled data defects and tracked them using a fault manifest.
+Published events to Kafka using transaction_id as the message key.
+Verified Kafka delivery counts against the fault manifest.
+Implemented a Spark bronze ingestion job with Parquet output and checkpointing.
+Tested checkpoint recovery and incremental event ingestion.
 Verified Results
-
-The following results have been observed in the local Docker environment.
-
 Metric	Result
-Events delivered to Kafka	4,200
-Events verified against manifest	4,200
-Injected duplicate events preserved	80
+Events delivered	4,200
+Injected duplicates	80
+Delivery failures	0
 Kafka partitions	3
 Producer throughput	~500 events/sec
-Producer delivery failures	0
-New events picked up after checkpoint restart	100
+Incremental events tested	100
 
-Checkpoint recovery test: Re-running the Spark ingestion job with the same checkpoint processed no new events. After adding 100 events, the pipeline picked up those new events, bringing the expected bronze count from 4,200 to 4,300.
+Results measured in a local Docker environment with a single Kafka broker.
 
-These measurements reflect a local development setup with a single Kafka broker, not a production benchmark.
+Roadmap
+Event generation and fault injection
+Kafka producer and delivery verification
+Spark bronze ingestion
+Checkpoint recovery testing
+Schema validation and quarantine
+Deduplication and late-event handling
+S3 data lake and dbt transformations
+Airflow orchestration and performance benchmarks
+Run Locally
 
-Quick Start
-Prerequisites
-Windows with PowerShell
-Docker Desktop with at least 4 GB of memory allocated
-Python 3.11
-Git
-1. Set up Python
+Prerequisites: Python 3.11 and Docker Desktop.
+
 powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-
-2. Start Kafka
-powershell
 docker compose up -d
 
-3. Generate synthetic events
+
+Generate events and inject faults:
+
 powershell
 python producer\generate_events.py --n-transactions 2000
 python producer\fault_injector.py
 
-4. Publish and verify events
+
+Publish and verify:
+
 powershell
 python producer\kafka_producer.py --rate 500
 python producer\kafka_verify.py --expected <total_output_events>
 
 
-Replace <total_output_events> with the value of total_output_events in data\fault_manifest.json.
+Run the Spark bronze job:
 
-5. Run Spark bronze ingestion
 powershell
 docker compose run --rm spark /opt/spark/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 --conf spark.jars.ivy=/tmp/.ivy /app/streaming/bronze_ingest.py
 
 
-The job reads events from Kafka and writes the raw payload and Kafka metadata to partitioned Parquet files. Its checkpoint tracks streaming progress across restarts.
+Replace <total_output_events> with the value recorded in data/fault_manifest.json.
 
 Data Contract
 
-The payment event schema and field definitions are documented in docs/data_contract.md.
+See docs/data_contract.md for the event schema and field definitions.
 
-The bronze layer preserves the original event payload alongside Kafka metadata, providing a foundation for subsequent validation, quarantine, and deduplication.
+Current Focus
 
-Engineering Focus
-Data reliability: Verify delivered event counts against an explicit fault manifest.
-Traceability: Retain Kafka topic, partition, offset, timestamp, and raw payload.
-Recovery: Use Structured Streaming checkpoints to resume ingestion.
-Data quality: Introduce validation and deduplication as separate downstream stages.
-Reproducibility: Run the local pipeline with Docker and synthetic data.
-Project Status
+Building a reliable streaming pipeline with verifiable ingestion, recoverable processing, and a clear path toward production-style data quality and orchestration.
 
-PayStream Guard is an active portfolio project. The initial Kafka ingestion and bronze-layer recovery milestones have been tested locally. Data quality processing, lakehouse transformations, orchestration, and performance evaluation remain planned milestones.
-
-Next milestone: Complete Week 2 validation, quarantine, deduplication, and late-event handling.
-
-Built as a hands-on data engineering project focused on streaming reliability and data quality.
-**
+Project status: Active development. All payment data is synthetic.
