@@ -17,3 +17,15 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  spark:
+    image: apache/spark:3.5.3
+    user: root
+    profiles: ["spark"]
+    depends_on:
+      - kafka
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      HOME: /tmp
