@@ -1,4 +1,4 @@
-PayStream Guard
+**PayStream Guard
 
 A Real-Time Payment Data Reliability Platform
 
@@ -13,7 +13,6 @@ Project Overview
 PayStream Guard demonstrates how a modern streaming data pipeline can ingest payment events, preserve raw records, and build toward reliable downstream data processing.
 
 Architecture
-text
 Synthetic Event Generator
           |
           v
@@ -35,6 +34,7 @@ Synthetic Event Generator
           v
  Validation & Deduplication
        (Week 2)
+
 
 Implementation Status
 Week 1 — Event Generation & Ingestion
@@ -140,3 +140,4 @@ PayStream Guard is an active portfolio project. The initial Kafka ingestion and 
 Next milestone: Complete Week 2 validation, quarantine, deduplication, and late-event handling.
 
 Built as a hands-on data engineering project focused on streaming reliability and data quality.
+**
