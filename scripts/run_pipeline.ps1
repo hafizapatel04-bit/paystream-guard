@@ -1,4 +1,6 @@
-﻿function Run-Spark($script) {
+﻿docker info *> $null
+if ($LASTEXITCODE -ne 0) { Write-Host "Docker engine is not running. Start Docker Desktop and retry."; exit 1 }
+function Run-Spark($script) {
     docker compose run --rm spark /opt/spark/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 --conf spark.jars.ivy=/tmp/.ivy $script
 }
 
@@ -15,3 +17,4 @@ python producer\kafka_producer.py --rate 500
 Run-Spark /app/streaming/bronze_ingest.py
 Run-Spark /app/streaming/silver_job.py
 python scripts\reconcile.py
+

@@ -3,12 +3,13 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+from lake_io import read_committed
 
 m = json.loads(Path("data/fault_manifest.json").read_text())
-bronze = pd.read_parquet("data/bronze/payment_events")
-silver = pd.read_parquet("data/silver/payment_events")
-quar = pd.read_parquet("data/quarantine/payment_events")
-late = pd.read_parquet("data/late/payment_events")
+bronze = read_committed("data/bronze/payment_events")
+silver = read_committed("data/silver/payment_events")
+quar = read_committed("data/quarantine/payment_events")
+late = read_committed("data/late/payment_events")
 
 exp_quar = set(m["invalid_amount"]) | set(m["missing_transaction_id"])
 exp_late = set(m["late_events"])
@@ -47,3 +48,4 @@ for name, ok, detail in checks:
     failed += (not ok)
 print(f"\n{len(checks) - failed}/{len(checks)} checks passed")
 sys.exit(1 if failed else 0)
+
