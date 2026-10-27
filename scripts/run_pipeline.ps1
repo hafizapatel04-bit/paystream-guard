@@ -18,3 +18,4 @@ Run-Spark /app/streaming/bronze_ingest.py
 Run-Spark /app/streaming/silver_job.py
 python scripts\reconcile.py
 
+python scripts\transactions.py
